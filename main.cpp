@@ -10,6 +10,6 @@ int main() {
     cada carpeta tiene un main propio donde solo se corre el .init
      */
     Client client;
-    client.encodeimage();
+    client.server_connect();
     return 0;
 }

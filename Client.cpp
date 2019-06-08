@@ -18,10 +18,15 @@
 
 using namespace std;
 
+/**
+ * @brief Esta función se encarga de convertir imagenes a base64 para poder
+ * enviar los datos mediante el servidor, en "path" se debe escojer el path de acuerdo a la maquina
+ * donde se estè usando.
+ * @return
+ */
 string Client::encodeimage() {
     const char *path = "/home/dantroll/CLionProjects/ClientTest/prueba.jpg";
     FILE* file = fopen(path,"rb");
-//some error checking stuff
     fseek(file, 0, SEEK_END);
     long len=ftell(file);
     fseek(file, 0, SEEK_SET);
@@ -36,8 +41,19 @@ string Client::encodeimage() {
 
 }
 
+/**
+ * @brief Esta es la funciòn encargada de levantar el servidor, cada vez que termina una conexiòn queda esperando
+ * por màs.
+ * *El problema es que el string que se recibe del cliente solo parece tener 33 caracteres, y aun no se como
+ * solucionarlo.
+ * @return
+ */
+
 int Client::server_connect() {
-    //	Create a socket
+    /**
+     * Esto solo es para inicializar correctamente la conexiòn y
+     * definir puerto e ip.
+     */
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock == -1) {
         return 1;
@@ -53,23 +69,27 @@ int Client::server_connect() {
     hint.sin_family = AF_INET;
     hint.sin_port = htons(port);
     inet_pton(AF_INET, ipAddress.c_str(), &hint.sin_addr);
+    /*************************************************
 
-    //	Connect to the server on the socket
+    /**
+     * Crea el nuevo socket con el que se va a comunicar con el server.
+     */
     int connectRes = connect(sock, (sockaddr *) &hint, sizeof(hint));
     if (connectRes == -1) {
         return 1;
     }
 
-    //	While loop:
     char buf[4096];
-    string userInput;
 
 
-    string mensajeCliente = "{\"ID10\":[591206,2,3,2,3,8,9,2,5],\"ID11\":[55241,6,6,4,1,7,4,9,5],\"ID14\":[236321,9,8,3,6,8,5,6,7]}";
-    std::cout <<mensajeCliente <<std::endl;
+    string mensajeCliente = encodeimage();
+    std::cout << mensajeCliente << std::endl;
 
-
-    int sendRes = send(sock,mensajeCliente.c_str() , sizeof(mensajeCliente) + 1, 0);
+    /**
+     * Aquì es donde se envìa al servidor la informaciòn, en este caso son los bytes de una
+     * imagen en base64.
+     */
+    int sendRes = send(sock, mensajeCliente.c_str() , sizeof(mensajeCliente) + 1, 0);
     if (sendRes == -1) {
         cout << "Could not send to server! Whoops!\r\n";
     }
